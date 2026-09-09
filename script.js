@@ -1,319 +1,406 @@
-const landingScreen = document.getElementById("landing-screen");
-const infoScreen = document.getElementById("info-screen");
-const welcomeScreen = document.getElementById("welcome-screen");
-const menuScreen = document.getElementById("menu-screen");
-const customScreen = document.getElementById("custom-screen");
-const clockScreen = document.getElementById("clock-screen");
-const gameoverScreen = document.getElementById("gameover-screen");
+/* =========================================================
+   CHESS CLUB CLOCK — script.js
+   Handles landing/info screens, welcome, time selection,
+   and the countdown chess clock
+   ========================================================= */
 
-const landingClockBtn = document.getElementById("landing-clock-btn");
-const landingInfoBtn = document.getElementById("landing-info-btn");
+(function () {
+  'use strict';
 
-const infoBackBtn = document.getElementById("info-back-btn");
+  /* ---------------------------------------------------------
+     STATE
+  --------------------------------------------------------- */
+  const state = {
+    player1Time: 0,
+    player2Time: 0,
+    increment: 0,
+    initialP1: 0,
+    initialP2: 0,
+    activePlayer: null,
+    gameState: 'idle',
+    timerId: null
+  };
 
-const welcomeContinueBtn = document.getElementById("welcome-continue-btn");
+  /* ---------------------------------------------------------
+     DOM REFERENCES
+  --------------------------------------------------------- */
+  const screens = {
+    landing: document.getElementById('landing-screen'),
+    info: document.getElementById('info-screen'),
+    welcome: document.getElementById('welcome-screen'),
+    menu: document.getElementById('menu-screen'),
+    custom: document.getElementById('custom-screen'),
+    clock: document.getElementById('clock-screen')
+  };
 
-const customTimeBtn = document.getElementById("custom-time-btn");
-const menuBackBtn = document.getElementById("menu-back-btn");
+  const landingClockBtn = document.getElementById('landing-clock-btn');
+  const landingInfoBtn = document.getElementById('landing-info-btn');
 
-const customStartBtn = document.getElementById("custom-start-btn");
-const customBackBtn = document.getElementById("custom-back-btn");
+  const infoBackBtn = document.getElementById('info-back-btn');
 
-const pauseBtn = document.getElementById("pause-btn");
-const resetBtn = document.getElementById("reset-btn");
+  const timeButtons = document.querySelectorAll('.time-btn');
+  const customTimeBtn = document.getElementById('custom-time-btn');
+  const menuHomeBtn = document.getElementById('menu-home-btn');
 
-const gameoverResetBtn = document.getElementById("gameover-reset-btn");
-const gameoverMenuBtn = document.getElementById("gameover-menu-btn");
+  const customBackBtn = document.getElementById('custom-back-btn');
+  const customStartBtn = document.getElementById('custom-start-btn');
+  const customP1Min = document.getElementById('custom-p1-min');
+  const customP1Sec = document.getElementById('custom-p1-sec');
+  const customP2Min = document.getElementById('custom-p2-min');
+  const customP2Sec = document.getElementById('custom-p2-sec');
+  const customIncrement = document.getElementById('custom-increment');
 
-const clock1 = document.getElementById("clock-1");
-const clock2 = document.getElementById("clock-2");
+  const player1El = document.getElementById('player-bottom');
+  const player2El = document.getElementById('player-top');
+  const time1El = document.getElementById('time-1');
+  const time2El = document.getElementById('time-2');
+  const status1El = document.getElementById('status-1');
+  const status2El = document.getElementById('status-2');
 
-const player1 = document.getElementById("player-1");
-const player2 = document.getElementById("player-2");
+  const startBtn = document.getElementById('start-btn');
+  const centerControls = document.getElementById('center-controls');
+  const miniControls = document.getElementById('mini-controls');
+  const pauseBtn = document.getElementById('pause-btn');
+  const resetBtn = document.getElementById('reset-btn');
 
-const gameoverMessage = document.getElementById("gameover-message");
+  const gameoverOverlay = document.getElementById('gameover-overlay');
+  const gameoverTitle = document.getElementById('gameover-title');
+  const gameoverMessage = document.getElementById('gameover-message');
+  const gameoverMenuBtn = document.getElementById('gameover-menu-btn');
 
-const timeButtons = document.querySelectorAll(".time-btn");
+  /* ---------------------------------------------------------
+     UTILITIES
+  --------------------------------------------------------- */
 
-let player1Time = 600;
-let player2Time = 600;
+  function showScreen(name) {
+    Object.values(screens).forEach(s => s.classList.remove('active'));
+    screens[name].classList.add('active');
+  }
 
-let increment = 0;
-let activePlayer = 1;
-let timer = null;
-let gameRunning = false;
-let gamePaused = false;
+  function formatTime(totalSeconds) {
+    totalSeconds = Math.max(0, Math.round(totalSeconds));
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
 
-function showScreen(screen) {
-    document.querySelectorAll(".screen").forEach((item) => {
-        item.classList.remove("active");
-    });
+    const mm = m.toString().padStart(2, '0');
+    const ss = s.toString().padStart(2, '0');
 
-    screen.classList.add("active");
-}
-
-function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-
-    return (
-        String(minutes).padStart(2, "0") +
-        ":" +
-        String(remainingSeconds).padStart(2, "0")
-    );
-}
-
-function updateClocks() {
-    clock1.textContent = formatTime(player1Time);
-    clock2.textContent = formatTime(player2Time);
-}
-
-function updateActivePlayer() {
-    player1.classList.remove("active-player");
-    player2.classList.remove("active-player");
-
-    if (activePlayer === 1) {
-        player1.classList.add("active-player");
-    } else {
-        player2.classList.add("active-player");
+    if (h > 0) {
+      return `${h}:${mm}:${ss}`;
     }
-}
+    return `${m}:${ss}`;
+  }
 
-function startTimer() {
-    clearInterval(timer);
+  function clearTimer() {
+    if (state.timerId) {
+      clearInterval(state.timerId);
+      state.timerId = null;
+    }
+  }
 
-    gameRunning = true;
-    gamePaused = false;
+  /* ---------------------------------------------------------
+     LANDING SCREEN
+  --------------------------------------------------------- */
 
-    timer = setInterval(() => {
+  landingClockBtn.addEventListener('click', () => {
+    showScreen('welcome');
+    setTimeout(() => {
+      showScreen('menu');
+    }, 1500);
+  });
 
-        if (!gameRunning || gamePaused) {
-            return;
+  landingInfoBtn.addEventListener('click', () => {
+    showScreen('info');
+  });
+
+  infoBackBtn.addEventListener('click', () => {
+    showScreen('landing');
+  });
+
+  /* ---------------------------------------------------------
+     MENU SCREEN — PRESET TIMES
+  --------------------------------------------------------- */
+
+  timeButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const minutes = parseInt(btn.dataset.minutes, 10);
+      const seconds = minutes * 60;
+      prepareClock(seconds, seconds, 0);
+    });
+  });
+
+  customTimeBtn.addEventListener('click', () => {
+    showScreen('custom');
+  });
+
+  menuHomeBtn.addEventListener('click', () => {
+    showScreen('landing');
+  });
+
+  /* ---------------------------------------------------------
+     CUSTOM TIME SCREEN
+  --------------------------------------------------------- */
+
+  customBackBtn.addEventListener('click', () => {
+    showScreen('menu');
+  });
+
+  customStartBtn.addEventListener('click', () => {
+    const p1Min = parseInt(customP1Min.value, 10) || 0;
+    const p1Sec = parseInt(customP1Sec.value, 10) || 0;
+    const p2Min = parseInt(customP2Min.value, 10) || 0;
+    const p2Sec = parseInt(customP2Sec.value, 10) || 0;
+    const inc = parseInt(customIncrement.value, 10) || 0;
+
+    const p1Total = (p1Min * 60) + p1Sec;
+    const p2Total = (p2Min * 60) + p2Sec;
+
+    if (p1Total <= 0 || p2Total <= 0) {
+      alert('Please set a starting time greater than 0 for both opponents.');
+      return;
+    }
+
+    prepareClock(p1Total, p2Total, Math.max(0, inc));
+  });
+
+  /* ---------------------------------------------------------
+     PREPARE & ENTER CLOCK SCREEN
+  --------------------------------------------------------- */
+
+  function prepareClock(p1Seconds, p2Seconds, incrementSeconds) {
+    clearTimer();
+
+    state.player1Time = p1Seconds;
+    state.player2Time = p2Seconds;
+    state.initialP1 = p1Seconds;
+    state.initialP2 = p2Seconds;
+    state.increment = incrementSeconds;
+    state.activePlayer = null;
+    state.gameState = 'idle';
+
+    updateDisplay();
+    resetPlayerStyles();
+    status1El.textContent = '';
+    status2El.textContent = '';
+
+    centerControls.classList.remove('hidden');
+    miniControls.classList.add('hidden');
+    pauseBtn.textContent = 'Pause';
+    gameoverOverlay.classList.remove('active');
+
+    showScreen('clock');
+  }
+
+  function resetPlayerStyles() {
+    player1El.classList.remove('active', 'inactive', 'timeout');
+    player2El.classList.remove('active', 'inactive', 'timeout');
+    player1El.classList.add('inactive');
+    player2El.classList.add('inactive');
+  }
+
+  function updateDisplay() {
+    time1El.textContent = formatTime(state.player1Time);
+    time2El.textContent = formatTime(state.player2Time);
+  }
+
+  /* ---------------------------------------------------------
+     GAME CONTROL — START
+  --------------------------------------------------------- */
+
+  startBtn.addEventListener('click', () => {
+    if (state.gameState !== 'idle') return;
+
+    state.gameState = 'running';
+    state.activePlayer = 1;
+
+    centerControls.classList.add('hidden');
+    miniControls.classList.remove('hidden');
+    pauseBtn.textContent = 'Pause';
+
+    setActiveStyles();
+    runTimer();
+  });
+
+  function setActiveStyles() {
+    if (state.activePlayer === 1) {
+      player1El.classList.remove('inactive');
+      player1El.classList.add('active');
+      player2El.classList.remove('active');
+      player2El.classList.add('inactive');
+      status1El.textContent = 'Your move';
+      status2El.textContent = '';
+    } else {
+      player2El.classList.remove('inactive');
+      player2El.classList.add('active');
+      player1El.classList.remove('active');
+      player1El.classList.add('inactive');
+      status2El.textContent = 'Your move';
+      status1El.textContent = '';
+    }
+  }
+
+  function runTimer() {
+    clearTimer();
+    state.timerId = setInterval(() => {
+      if (state.gameState !== 'running') return;
+
+      if (state.activePlayer === 1) {
+        state.player1Time -= 1;
+        if (state.player1Time <= 0) {
+          state.player1Time = 0;
+          updateDisplay();
+          endGame(1);
+          return;
         }
-
-        if (activePlayer === 1) {
-            player1Time--;
-
-            if (player1Time <= 0) {
-                player1Time = 0;
-                endGame(2);
-            }
-        } else {
-            player2Time--;
-
-            if (player2Time <= 0) {
-                player2Time = 0;
-                endGame(1);
-            }
+      } else {
+        state.player2Time -= 1;
+        if (state.player2Time <= 0) {
+          state.player2Time = 0;
+          updateDisplay();
+          endGame(2);
+          return;
         }
+      }
 
-        updateClocks();
-
+      updateDisplay();
     }, 1000);
-}
+  }
 
-function switchPlayer() {
+  /* ---------------------------------------------------------
+     PLAYER TAP HANDLERS
+  --------------------------------------------------------- */
 
-    if (!gameRunning || gamePaused) {
-        return;
-    }
+  function handlePlayerTap(playerNum) {
+    if (state.gameState !== 'running') return;
+    if (state.activePlayer !== playerNum) return;
 
-    if (activePlayer === 1) {
-        player1Time += increment;
-        activePlayer = 2;
+    if (playerNum === 1) {
+      state.player1Time += state.increment;
+      state.activePlayer = 2;
     } else {
-        player2Time += increment;
-        activePlayer = 1;
+      state.player2Time += state.increment;
+      state.activePlayer = 1;
     }
 
-    updateClocks();
-    updateActivePlayer();
-}
+    updateDisplay();
+    setActiveStyles();
+    runTimer();
+  }
 
-function startGame(minutes, seconds, gameIncrement) {
+  player1El.addEventListener('click', () => handlePlayerTap(1));
+  player2El.addEventListener('click', () => handlePlayerTap(2));
 
-    clearInterval(timer);
+  /* ---------------------------------------------------------
+     PAUSE / RESUME
+  --------------------------------------------------------- */
 
-    player1Time = minutes * 60 + seconds;
-    player2Time = minutes * 60 + seconds;
+  pauseBtn.addEventListener('click', () => {
+    if (state.gameState === 'running') {
+      state.gameState = 'paused';
+      clearTimer();
+      pauseBtn.textContent = 'Resume';
 
-    increment = gameIncrement;
+      if (state.activePlayer === 1) {
+        status1El.textContent = 'Paused';
+      } else {
+        status2El.textContent = 'Paused';
+      }
 
-    activePlayer = 1;
-    gameRunning = true;
-    gamePaused = false;
+    } else if (state.gameState === 'paused') {
+      state.gameState = 'running';
+      pauseBtn.textContent = 'Pause';
 
-    updateClocks();
-    updateActivePlayer();
+      if (state.activePlayer === 1) {
+        status1El.textContent = 'Your move';
+      } else {
+        status2El.textContent = 'Your move';
+      }
 
-    showScreen(clockScreen);
+      runTimer();
+    }
+  });
 
-    startTimer();
-}
+  /* ---------------------------------------------------------
+     RESET
+  --------------------------------------------------------- */
 
-function endGame(winner) {
+  resetBtn.addEventListener('click', () => {
+    const confirmReset = confirm('Reset the clock and return to the menu?');
 
-    clearInterval(timer);
+    if (!confirmReset) return;
 
-    gameRunning = false;
-    gamePaused = false;
+    clearTimer();
+    state.gameState = 'idle';
+    state.activePlayer = null;
+    gameoverOverlay.classList.remove('active');
 
-    gameoverMessage.textContent =
-        "Player " + winner + " wins!";
+    showScreen('menu');
+  });
 
-    showScreen(gameoverScreen);
-}
+  /* ---------------------------------------------------------
+     GAME OVER
+  --------------------------------------------------------- */
 
-landingClockBtn.addEventListener("click", () => {
-    showScreen(welcomeScreen);
-});
+  function endGame(loserPlayer) {
+    state.gameState = 'gameover';
+    clearTimer();
 
-landingInfoBtn.addEventListener("click", () => {
-    showScreen(infoScreen);
-});
-
-infoBackBtn.addEventListener("click", () => {
-    showScreen(landingScreen);
-});
-
-welcomeContinueBtn.addEventListener("click", () => {
-    showScreen(menuScreen);
-});
-
-menuBackBtn.addEventListener("click", () => {
-    showScreen(landingScreen);
-});
-
-customTimeBtn.addEventListener("click", () => {
-    showScreen(customScreen);
-});
-
-customBackBtn.addEventListener("click", () => {
-    showScreen(menuScreen);
-});
-
-timeButtons.forEach((button) => {
-
-    button.addEventListener("click", () => {
-
-        const minutes = Number(button.dataset.minutes);
-
-        startGame(minutes, 0, 0);
-
-    });
-
-});
-
-customStartBtn.addEventListener("click", () => {
-
-    const minutes =
-        Number(document.getElementById("custom-minutes").value) || 0;
-
-    const seconds =
-        Number(document.getElementById("custom-seconds").value) || 0;
-
-    const customIncrement =
-        Number(document.getElementById("custom-increment").value) || 0;
-
-    if (minutes < 1 && seconds < 1) {
-        return;
+    if (loserPlayer === 1) {
+      player1El.classList.add('timeout');
+      status1El.textContent = 'Time out!';
+      status2El.textContent = '';
+      gameoverMessage.textContent =
+        'Opponent 1 ran out of time. Opponent 2 wins!';
+    } else {
+      player2El.classList.add('timeout');
+      status2El.textContent = 'Time out!';
+      status1El.textContent = '';
+      gameoverMessage.textContent =
+        'Opponent 2 ran out of time. Opponent 1 wins!';
     }
 
-    startGame(minutes, seconds, customIncrement);
+    gameoverTitle.textContent = 'Game Over';
+    gameoverOverlay.classList.add('active');
 
-});
+    miniControls.classList.add('hidden');
+    centerControls.classList.add('hidden');
+  }
 
-player1.addEventListener("click", () => {
+  gameoverMenuBtn.addEventListener('click', () => {
+    gameoverOverlay.classList.remove('active');
 
-    if (activePlayer === 1) {
-        switchPlayer();
+    clearTimer();
+    state.gameState = 'idle';
+    state.activePlayer = null;
+
+    showScreen('menu');
+  });
+
+  /* ---------------------------------------------------------
+     PREVENT ACCIDENTAL SCROLL / ZOOM WHILE PLAYING
+  --------------------------------------------------------- */
+
+  document.addEventListener('touchmove', (e) => {
+    if (screens.clock.classList.contains('active')) {
+      e.preventDefault();
     }
+  }, { passive: false });
 
-});
-
-player2.addEventListener("click", () => {
-
-    if (activePlayer === 2) {
-        switchPlayer();
+  document.addEventListener('contextmenu', (e) => {
+    if (screens.clock.classList.contains('active')) {
+      e.preventDefault();
     }
+  });
 
-});
+  document.addEventListener('gesturestart', (e) => e.preventDefault());
 
-pauseBtn.addEventListener("click", () => {
+  /* ---------------------------------------------------------
+     BOOTSTRAP
+  --------------------------------------------------------- */
 
-    if (!gameRunning) {
-        return;
-    }
+  document.addEventListener('DOMContentLoaded', () => {
+    showScreen('landing');
+  });
 
-    gamePaused = !gamePaused;
-
-    pauseBtn.textContent = gamePaused
-        ? "Resume"
-        : "Pause";
-
-});
-
-resetBtn.addEventListener("click", () => {
-
-    clearInterval(timer);
-
-    player1Time = player1Time;
-    player2Time = player2Time;
-
-    activePlayer = 1;
-    gameRunning = true;
-    gamePaused = false;
-
-    updateClocks();
-    updateActivePlayer();
-
-    pauseBtn.textContent = "Pause";
-
-    startTimer();
-
-});
-
-gameoverResetBtn.addEventListener("click", () => {
-
-    showScreen(menuScreen);
-
-});
-
-gameoverMenuBtn.addEventListener("click", () => {
-
-    clearInterval(timer);
-
-    gameRunning = false;
-    gamePaused = false;
-
-    showScreen(landingScreen);
-
-});
-
-document.addEventListener("contextmenu", (event) => {
-    event.preventDefault();
-});
-
-document.addEventListener("touchstart", (event) => {
-
-    if (event.touches.length > 1) {
-        event.preventDefault();
-    }
-
-}, { passive: false });
-
-document.addEventListener("touchmove", (event) => {
-    event.preventDefault();
-}, { passive: false });
-
-document.addEventListener("touchend", (event) => {
-
-    if (event.touches.length > 0) {
-        event.preventDefault();
-    }
-
-}, { passive: false });
-
-updateClocks();
-updateActivePlayer();
-showScreen(landingScreen);
+})();
