@@ -155,6 +155,22 @@ button {
     cursor: not-allowed;
 }
 
+.back-button {
+    display: block;
+    margin: 25px auto 0;
+    padding: 12px 22px;
+    border: 1px solid #567c65;
+    background: #122e20;
+    color: #dce9e0;
+    border-radius: 9px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.back-button:hover {
+    background: #1b4931;
+}
+
 .hidden {
     display: none;
 }
@@ -186,5 +202,10 @@ button {
 
     .elo {
         width: 80px;
+    }
+
+    .back-button {
+        width: 100%;
+        margin-top: 20px;
     }
 }
