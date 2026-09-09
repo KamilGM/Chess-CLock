@@ -1,395 +1,319 @@
-const landingClockBtn = document.getElementById('landing-clock-btn');
-const landingInfoBtn = document.getElementById('landing-info-btn');
+const landingScreen = document.getElementById("landing-screen");
+const infoScreen = document.getElementById("info-screen");
+const welcomeScreen = document.getElementById("welcome-screen");
+const menuScreen = document.getElementById("menu-screen");
+const customScreen = document.getElementById("custom-screen");
+const clockScreen = document.getElementById("clock-screen");
+const gameoverScreen = document.getElementById("gameover-screen");
 
-const landingScreen = document.getElementById('landing-screen');
-const infoScreen = document.getElementById('info-screen');
-const welcomeScreen = document.getElementById('welcome-screen');
-const menuScreen = document.getElementById('menu-screen');
-const customTimeScreen = document.getElementById('custom-time-screen');
-const clockScreen = document.getElementById('clock-screen');
-const gameOverScreen = document.getElementById('game-over-screen');
+const landingClockBtn = document.getElementById("landing-clock-btn");
+const landingInfoBtn = document.getElementById("landing-info-btn");
 
-const startButton = document.getElementById('start-button');
-const customTimeButton = document.getElementById('custom-time-button');
-const backToMenuButton = document.getElementById('back-to-menu-button');
-const backToLandingButton = document.getElementById('back-to-landing-button');
+const infoBackBtn = document.getElementById("info-back-btn");
 
-const customMinutesInput = document.getElementById('custom-minutes');
-const customSecondsInput = document.getElementById('custom-seconds');
+const welcomeContinueBtn = document.getElementById("welcome-continue-btn");
 
-const player1Clock = document.getElementById('player1-clock');
-const player2Clock = document.getElementById('player2-clock');
+const customTimeBtn = document.getElementById("custom-time-btn");
+const menuBackBtn = document.getElementById("menu-back-btn");
 
-const pauseButton = document.getElementById('pause-button');
-const resetButton = document.getElementById('reset-button');
+const customStartBtn = document.getElementById("custom-start-btn");
+const customBackBtn = document.getElementById("custom-back-btn");
 
-const gameOverTitle = document.getElementById('game-over-title');
-const gameOverMessage = document.getElementById('game-over-message');
-const gameOverResetButton = document.getElementById('game-over-reset-button');
-const gameOverMenuButton = document.getElementById('game-over-menu-button');
+const pauseBtn = document.getElementById("pause-btn");
+const resetBtn = document.getElementById("reset-btn");
 
-let player1Time = 0;
-let player2Time = 0;
+const gameoverResetBtn = document.getElementById("gameover-reset-btn");
+const gameoverMenuBtn = document.getElementById("gameover-menu-btn");
 
+const clock1 = document.getElementById("clock-1");
+const clock2 = document.getElementById("clock-2");
+
+const player1 = document.getElementById("player-1");
+const player2 = document.getElementById("player-2");
+
+const gameoverMessage = document.getElementById("gameover-message");
+
+const timeButtons = document.querySelectorAll(".time-btn");
+
+let player1Time = 600;
+let player2Time = 600;
+
+let increment = 0;
 let activePlayer = 1;
-let timerInterval = null;
-let isRunning = false;
-let isPaused = false;
-
-let selectedMinutes = 5;
-let selectedSeconds = 0;
+let timer = null;
+let gameRunning = false;
+let gamePaused = false;
 
 function showScreen(screen) {
-    const screens = [
-        landingScreen,
-        infoScreen,
-        welcomeScreen,
-        menuScreen,
-        customTimeScreen,
-        clockScreen,
-        gameOverScreen
-    ];
-
-    screens.forEach(function(currentScreen) {
-        if (currentScreen) {
-            currentScreen.style.display = 'none';
-        }
+    document.querySelectorAll(".screen").forEach((item) => {
+        item.classList.remove("active");
     });
 
-    if (screen) {
-        screen.style.display = 'flex';
-    }
+    screen.classList.add("active");
 }
 
-function formatTime(totalSeconds) {
-    totalSeconds = Math.max(0, Math.floor(totalSeconds));
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
 
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-
-    return String(minutes).padStart(2, '0') + ':' +
-           String(seconds).padStart(2, '0');
+    return (
+        String(minutes).padStart(2, "0") +
+        ":" +
+        String(remainingSeconds).padStart(2, "0")
+    );
 }
 
-function updateClockDisplay() {
-    if (player1Clock) {
-        player1Clock.textContent = formatTime(player1Time);
-    }
-
-    if (player2Clock) {
-        player2Clock.textContent = formatTime(player2Time);
-    }
+function updateClocks() {
+    clock1.textContent = formatTime(player1Time);
+    clock2.textContent = formatTime(player2Time);
 }
 
-function stopTimer() {
-    if (timerInterval !== null) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
+function updateActivePlayer() {
+    player1.classList.remove("active-player");
+    player2.classList.remove("active-player");
 
-    isRunning = false;
+    if (activePlayer === 1) {
+        player1.classList.add("active-player");
+    } else {
+        player2.classList.add("active-player");
+    }
 }
 
 function startTimer() {
-    if (isRunning || isPaused) {
-        return;
-    }
+    clearInterval(timer);
 
-    isRunning = true;
+    gameRunning = true;
+    gamePaused = false;
 
-    timerInterval = setInterval(function() {
+    timer = setInterval(() => {
+
+        if (!gameRunning || gamePaused) {
+            return;
+        }
+
         if (activePlayer === 1) {
             player1Time--;
 
             if (player1Time <= 0) {
                 player1Time = 0;
-                updateClockDisplay();
                 endGame(2);
-                return;
             }
         } else {
             player2Time--;
 
             if (player2Time <= 0) {
                 player2Time = 0;
-                updateClockDisplay();
                 endGame(1);
-                return;
             }
         }
 
-        updateClockDisplay();
+        updateClocks();
+
     }, 1000);
 }
 
-function pauseGame() {
-    if (!isRunning) {
-        return;
-    }
-
-    stopTimer();
-    isPaused = true;
-
-    if (pauseButton) {
-        pauseButton.textContent = 'Resume';
-    }
-}
-
-function resumeGame() {
-    if (!isPaused) {
-        return;
-    }
-
-    isPaused = false;
-
-    if (pauseButton) {
-        pauseButton.textContent = 'Pause';
-    }
-
-    startTimer();
-}
-
-function resetGame() {
-    stopTimer();
-
-    isPaused = false;
-    activePlayer = 1;
-
-    player1Time = selectedMinutes * 60 + selectedSeconds;
-    player2Time = selectedMinutes * 60 + selectedSeconds;
-
-    updateClockDisplay();
-
-    if (pauseButton) {
-        pauseButton.textContent = 'Pause';
-    }
-
-    showScreen(clockScreen);
-    startTimer();
-}
-
 function switchPlayer() {
-    if (!isRunning || isPaused) {
+
+    if (!gameRunning || gamePaused) {
         return;
     }
-
-    stopTimer();
 
     if (activePlayer === 1) {
+        player1Time += increment;
         activePlayer = 2;
     } else {
+        player2Time += increment;
         activePlayer = 1;
     }
+
+    updateClocks();
+    updateActivePlayer();
+}
+
+function startGame(minutes, seconds, gameIncrement) {
+
+    clearInterval(timer);
+
+    player1Time = minutes * 60 + seconds;
+    player2Time = minutes * 60 + seconds;
+
+    increment = gameIncrement;
+
+    activePlayer = 1;
+    gameRunning = true;
+    gamePaused = false;
+
+    updateClocks();
+    updateActivePlayer();
+
+    showScreen(clockScreen);
 
     startTimer();
 }
 
 function endGame(winner) {
-    stopTimer();
-    isPaused = false;
 
-    if (winner === 1) {
-        if (gameOverTitle) {
-            gameOverTitle.textContent = 'Player 1 Wins!';
-        }
+    clearInterval(timer);
 
-        if (gameOverMessage) {
-            gameOverMessage.textContent = 'Player 2 ran out of time.';
-        }
-    } else {
-        if (gameOverTitle) {
-            gameOverTitle.textContent = 'Player 2 Wins!';
-        }
+    gameRunning = false;
+    gamePaused = false;
 
-        if (gameOverMessage) {
-            gameOverMessage.textContent = 'Player 1 ran out of time.';
-        }
-    }
+    gameoverMessage.textContent =
+        "Player " + winner + " wins!";
 
-    showScreen(gameOverScreen);
+    showScreen(gameoverScreen);
 }
 
-function startGame(minutes, seconds) {
-    selectedMinutes = minutes;
-    selectedSeconds = seconds;
-
-    player1Time = minutes * 60 + seconds;
-    player2Time = minutes * 60 + seconds;
-
-    activePlayer = 1;
-    isPaused = false;
-
-    if (pauseButton) {
-        pauseButton.textContent = 'Pause';
-    }
-
-    updateClockDisplay();
-    showScreen(clockScreen);
-    startTimer();
-}
-
-if (landingClockBtn) {
-    landingClockBtn.addEventListener('click', function() {
-        showScreen(welcomeScreen);
-    });
-}
-
-if (landingInfoBtn) {
-    landingInfoBtn.addEventListener('click', function() {
-        showScreen(infoScreen);
-    });
-}
-
-if (startButton) {
-    startButton.addEventListener('click', function() {
-        showScreen(menuScreen);
-    });
-}
-
-if (customTimeButton) {
-    customTimeButton.addEventListener('click', function() {
-        showScreen(customTimeScreen);
-    });
-}
-
-if (backToMenuButton) {
-    backToMenuButton.addEventListener('click', function() {
-        stopTimer();
-        isPaused = false;
-        showScreen(menuScreen);
-    });
-}
-
-if (backToLandingButton) {
-    backToLandingButton.addEventListener('click', function() {
-        stopTimer();
-        isPaused = false;
-        showScreen(landingScreen);
-    });
-}
-
-if (pauseButton) {
-    pauseButton.addEventListener('click', function() {
-        if (isPaused) {
-            resumeGame();
-        } else {
-            pauseGame();
-        }
-    });
-}
-
-if (resetButton) {
-    resetButton.addEventListener('click', function() {
-        resetGame();
-    });
-}
-
-if (gameOverResetButton) {
-    gameOverResetButton.addEventListener('click', function() {
-        resetGame();
-    });
-}
-
-if (gameOverMenuButton) {
-    gameOverMenuButton.addEventListener('click', function() {
-        stopTimer();
-        isPaused = false;
-        showScreen(menuScreen);
-    });
-}
-
-if (customTimeScreen) {
-    const customStartButton = document.getElementById('custom-start-button');
-
-    if (customStartButton) {
-        customStartButton.addEventListener('click', function() {
-            let minutes = parseInt(customMinutesInput?.value, 10);
-            let seconds = parseInt(customSecondsInput?.value, 10);
-
-            if (isNaN(minutes)) {
-                minutes = 0;
-            }
-
-            if (isNaN(seconds)) {
-                seconds = 0;
-            }
-
-            minutes = Math.max(0, minutes);
-            seconds = Math.max(0, Math.min(59, seconds));
-
-            if (minutes === 0 && seconds === 0) {
-                minutes = 1;
-            }
-
-            startGame(minutes, seconds);
-        });
-    }
-}
-
-if (player1Clock) {
-    player1Clock.addEventListener('click', function() {
-        if (activePlayer === 1) {
-            switchPlayer();
-        }
-    });
-
-    player1Clock.addEventListener('touchstart', function(event) {
-        event.preventDefault();
-
-        if (activePlayer === 1) {
-            switchPlayer();
-        }
-    }, { passive: false });
-}
-
-if (player2Clock) {
-    player2Clock.addEventListener('click', function() {
-        if (activePlayer === 2) {
-            switchPlayer();
-        }
-    });
-
-    player2Clock.addEventListener('touchstart', function(event) {
-        event.preventDefault();
-
-        if (activePlayer === 2) {
-            switchPlayer();
-        }
-    }, { passive: false });
-}
-
-document.addEventListener('keydown', function(event) {
-    if (event.code === 'Space') {
-        if (clockScreen && clockScreen.style.display !== 'none') {
-            event.preventDefault();
-
-            if (isPaused) {
-                resumeGame();
-            } else {
-                pauseGame();
-            }
-        }
-    }
-
-    if (event.key === 'r' || event.key === 'R') {
-        if (clockScreen && clockScreen.style.display !== 'none') {
-            resetGame();
-        }
-    }
+landingClockBtn.addEventListener("click", () => {
+    showScreen(welcomeScreen);
 });
 
-document.addEventListener('contextmenu', function(event) {
-    if (clockScreen && clockScreen.style.display !== 'none') {
-        event.preventDefault();
-    }
+landingInfoBtn.addEventListener("click", () => {
+    showScreen(infoScreen);
 });
 
-document.addEventListener('touchmove', function(event) {
-    if (clockScreen && clockScreen.style.display !== 'none') {
-        event.preventDefault();
-    }
-}, { passive: false });
-
-window.addEventListener('load', function() {
+infoBackBtn.addEventListener("click", () => {
     showScreen(landingScreen);
 });
+
+welcomeContinueBtn.addEventListener("click", () => {
+    showScreen(menuScreen);
+});
+
+menuBackBtn.addEventListener("click", () => {
+    showScreen(landingScreen);
+});
+
+customTimeBtn.addEventListener("click", () => {
+    showScreen(customScreen);
+});
+
+customBackBtn.addEventListener("click", () => {
+    showScreen(menuScreen);
+});
+
+timeButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        const minutes = Number(button.dataset.minutes);
+
+        startGame(minutes, 0, 0);
+
+    });
+
+});
+
+customStartBtn.addEventListener("click", () => {
+
+    const minutes =
+        Number(document.getElementById("custom-minutes").value) || 0;
+
+    const seconds =
+        Number(document.getElementById("custom-seconds").value) || 0;
+
+    const customIncrement =
+        Number(document.getElementById("custom-increment").value) || 0;
+
+    if (minutes < 1 && seconds < 1) {
+        return;
+    }
+
+    startGame(minutes, seconds, customIncrement);
+
+});
+
+player1.addEventListener("click", () => {
+
+    if (activePlayer === 1) {
+        switchPlayer();
+    }
+
+});
+
+player2.addEventListener("click", () => {
+
+    if (activePlayer === 2) {
+        switchPlayer();
+    }
+
+});
+
+pauseBtn.addEventListener("click", () => {
+
+    if (!gameRunning) {
+        return;
+    }
+
+    gamePaused = !gamePaused;
+
+    pauseBtn.textContent = gamePaused
+        ? "Resume"
+        : "Pause";
+
+});
+
+resetBtn.addEventListener("click", () => {
+
+    clearInterval(timer);
+
+    player1Time = player1Time;
+    player2Time = player2Time;
+
+    activePlayer = 1;
+    gameRunning = true;
+    gamePaused = false;
+
+    updateClocks();
+    updateActivePlayer();
+
+    pauseBtn.textContent = "Pause";
+
+    startTimer();
+
+});
+
+gameoverResetBtn.addEventListener("click", () => {
+
+    showScreen(menuScreen);
+
+});
+
+gameoverMenuBtn.addEventListener("click", () => {
+
+    clearInterval(timer);
+
+    gameRunning = false;
+    gamePaused = false;
+
+    showScreen(landingScreen);
+
+});
+
+document.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+});
+
+document.addEventListener("touchstart", (event) => {
+
+    if (event.touches.length > 1) {
+        event.preventDefault();
+    }
+
+}, { passive: false });
+
+document.addEventListener("touchmove", (event) => {
+    event.preventDefault();
+}, { passive: false });
+
+document.addEventListener("touchend", (event) => {
+
+    if (event.touches.length > 0) {
+        event.preventDefault();
+    }
+
+}, { passive: false });
+
+updateClocks();
+updateActivePlayer();
+showScreen(landingScreen);
