@@ -11,13 +11,13 @@
      STATE
   --------------------------------------------------------- */
   const state = {
-    player1Time: 0,      // seconds remaining
+    player1Time: 0,
     player2Time: 0,
-    increment: 0,         // seconds added per move
+    increment: 0,
     initialP1: 0,
     initialP2: 0,
-    activePlayer: null,   // 1 or 2
-    gameState: 'idle',     // idle | running | paused | gameover
+    activePlayer: null,
+    gameState: 'idle',
     timerId: null
   };
 
@@ -36,6 +36,7 @@
   // Landing
   const landingClockBtn = document.getElementById('landing-clock-btn');
   const landingInfoBtn = document.getElementById('landing-info-btn');
+  const landingLeaderboardBtn = document.getElementById('landing-leaderboard-btn');
 
   // Info
   const infoBackBtn = document.getElementById('info-back-btn');
@@ -95,6 +96,7 @@
     if (h > 0) {
       return `${h}:${mm}:${ss}`;
     }
+
     return `${m}:${ss}`;
   }
 
@@ -111,6 +113,7 @@
 
   landingClockBtn.addEventListener('click', () => {
     showScreen('welcome');
+
     setTimeout(() => {
       showScreen('menu');
     }, 1500);
@@ -118,6 +121,10 @@
 
   landingInfoBtn.addEventListener('click', () => {
     showScreen('info');
+  });
+
+  landingLeaderboardBtn.addEventListener('click', () => {
+    window.location.href = 'Chess leaderboard/index.html';
   });
 
   infoBackBtn.addEventListener('click', () => {
@@ -132,6 +139,7 @@
     btn.addEventListener('click', () => {
       const minutes = parseInt(btn.dataset.minutes, 10);
       const seconds = minutes * 60;
+
       prepareClock(seconds, seconds, 0);
     });
   });
@@ -187,6 +195,7 @@
 
     updateDisplay();
     resetPlayerStyles();
+
     status1El.textContent = '';
     status2El.textContent = '';
 
@@ -201,6 +210,7 @@
   function resetPlayerStyles() {
     player1El.classList.remove('active', 'inactive', 'timeout');
     player2El.classList.remove('active', 'inactive', 'timeout');
+
     player1El.classList.add('inactive');
     player2El.classList.add('inactive');
   }
@@ -232,15 +242,19 @@
     if (state.activePlayer === 1) {
       player1El.classList.remove('inactive');
       player1El.classList.add('active');
+
       player2El.classList.remove('active');
       player2El.classList.add('inactive');
+
       status1El.textContent = 'Your move';
       status2El.textContent = '';
     } else {
       player2El.classList.remove('inactive');
       player2El.classList.add('active');
+
       player1El.classList.remove('active');
       player1El.classList.add('inactive');
+
       status2El.textContent = 'Your move';
       status1El.textContent = '';
     }
@@ -248,11 +262,13 @@
 
   function runTimer() {
     clearTimer();
+
     state.timerId = setInterval(() => {
       if (state.gameState !== 'running') return;
 
       if (state.activePlayer === 1) {
         state.player1Time -= 1;
+
         if (state.player1Time <= 0) {
           state.player1Time = 0;
           updateDisplay();
@@ -261,6 +277,7 @@
         }
       } else {
         state.player2Time -= 1;
+
         if (state.player2Time <= 0) {
           state.player2Time = 0;
           updateDisplay();
@@ -268,6 +285,7 @@
           return;
         }
       }
+
       updateDisplay();
     }, 1000);
   }
@@ -278,7 +296,7 @@
 
   function handlePlayerTap(playerNum) {
     if (state.gameState !== 'running') return;
-    if (state.activePlayer !== playerNum) return; // only active player's tap switches turn
+    if (state.activePlayer !== playerNum) return;
 
     // Apply increment to the player who just finished their move
     if (playerNum === 1) {
@@ -305,20 +323,25 @@
     if (state.gameState === 'running') {
       state.gameState = 'paused';
       clearTimer();
+
       pauseBtn.textContent = 'Resume';
+
       if (state.activePlayer === 1) {
         status1El.textContent = 'Paused';
       } else {
         status2El.textContent = 'Paused';
       }
+
     } else if (state.gameState === 'paused') {
       state.gameState = 'running';
       pauseBtn.textContent = 'Pause';
+
       if (state.activePlayer === 1) {
         status1El.textContent = 'Your move';
       } else {
         status2El.textContent = 'Your move';
       }
+
       runTimer();
     }
   });
@@ -329,12 +352,14 @@
 
   resetBtn.addEventListener('click', () => {
     const confirmReset = confirm('Reset the clock and return to the menu?');
+
     if (!confirmReset) return;
 
     clearTimer();
     state.gameState = 'idle';
     state.activePlayer = null;
     gameoverOverlay.classList.remove('active');
+
     showScreen('menu');
   });
 
@@ -350,12 +375,17 @@
       player1El.classList.add('timeout');
       status1El.textContent = 'Time out!';
       status2El.textContent = '';
-      gameoverMessage.textContent = 'Opponent 1 ran out of time. Opponent 2 wins!';
+
+      gameoverMessage.textContent =
+        'Opponent 1 ran out of time. Opponent 2 wins!';
+
     } else {
       player2El.classList.add('timeout');
       status2El.textContent = 'Time out!';
       status1El.textContent = '';
-      gameoverMessage.textContent = 'Opponent 2 ran out of time. Opponent 1 wins!';
+
+      gameoverMessage.textContent =
+        'Opponent 2 ran out of time. Opponent 1 wins!';
     }
 
     gameoverTitle.textContent = 'Game Over';
@@ -368,8 +398,10 @@
   gameoverMenuBtn.addEventListener('click', () => {
     gameoverOverlay.classList.remove('active');
     clearTimer();
+
     state.gameState = 'idle';
     state.activePlayer = null;
+
     showScreen('menu');
   });
 
