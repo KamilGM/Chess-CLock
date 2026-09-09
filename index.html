@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Chess Club Clock</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chess Clock</title>
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <!-- ============ LANDING SCREEN ============ -->
-  <div id="landing-screen" class="screen active">
+  <!-- LANDING SCREEN -->
+  <section id="landing-screen" class="screen active">
     <div class="landing-container">
-      <div class="landing-header">
-        <div class="landing-icon">♟</div>
-        <h1>Chess Club</h1>
-      </div>
+
+      <h1>Chess Club</h1>
+      <p class="landing-subtitle">Chess Clock</p>
 
       <div class="landing-buttons">
 
@@ -28,190 +28,212 @@
           <span class="landing-btn-text">More Information<br>About Chess Club</span>
         </button>
 
-        <button id="landing-leaderboard-btn" class="landing-btn secondary-btn">
+        <button id="landing-leaderboard-btn"
+                class="landing-btn secondary-btn"
+                onclick="window.location.href='Chess leaderboard/index.html'">
           <span class="landing-btn-icon">🏆</span>
           <span class="landing-btn-text">Chess Leaderboard</span>
         </button>
 
       </div>
-    </div>
-  </div>
 
-  <!-- ============ INFO SCREEN ============ -->
-  <div id="info-screen" class="screen">
+    </div>
+  </section>
+
+
+  <!-- INFORMATION SCREEN -->
+  <section id="info-screen" class="screen">
+
     <div class="info-container">
-      <h2>About Chess Club</h2>
+
+      <button id="info-back-btn" class="back-btn">← Back</button>
+
+      <h1>About Chess Club</h1>
 
       <p>
-        <strong>About the Chess Club</strong>
+        I started Chess Club in S1 because I wanted to give people a place
+        to play chess. Unfortunately, not many people attended, and my
+        teacher eventually allowed people to do other activities instead.
+        I stopped going, but I decided to restart Chess Club properly in S2.
+      </p>
+
+      <h2>When and Where?</h2>
+
+      <p>
+        Chess Club takes place in Room 2-043 on Thursdays and Fridays.
+        Chess boards will be available, but you can also bring your own set.
       </p>
 
       <p>
-        I originally started the chess club in S1 because I wanted to give people a place where they could play and enjoy chess. However, I quickly realised I was not running it in the best way, and only a few people were interested in coming. Eventually, I stopped going, especially when the teacher started allowing other people to use the club for different activities. Since this was right before moving into S2, I decided that instead of giving up on the idea, I would start it again the following year and do it properly.
+        You can play against a friend, another member, or even play online.
+        Beginners are welcome, and I can help teach you how to play.
+      </p>
+
+      <h2>Why Chess?</h2>
+
+      <p>
+        Chess helps you think ahead, plan your moves, make strategic
+        decisions, concentrate, be patient, and solve problems.
+        It can also be mentally tiring, which makes it a great challenge.
+      </p>
+
+      <h2>A Little About Me</h2>
+
+      <p>
+        I started playing chess when I was five. I play chess every day
+        for at least 30 minutes and aim to get at least five checkmates
+        every day.
       </p>
 
       <p>
-        Now, the chess club meets in Room 2-043 on Thursdays and Fridays. We have chess boards available, but you can also bring your own chess set if you want. You can play against whoever you want, whether that is a friend, someone you have never played before, or even play online. If you do not know how to play chess, that is completely fine because I am happy to teach you. Whether you are a complete beginner or an experienced player, everyone is welcome.
+        I also made this chess clock specifically for the Chess Club.
       </p>
 
       <p>
-        <strong>Why Chess?</strong>
+        Use the Chess Clock button on the home screen to start playing.
       </p>
 
-      <p>
-        Chess is more than just a game. It can help you develop your ability to think ahead, plan your moves and make strategic decisions. It also requires concentration, patience and problem solving. Playing a challenging game can even be mentally tiring because your brain is constantly thinking about different possibilities.
-      </p>
-
-      <p>
-        <strong>A Little About Me</strong>
-      </p>
-
-      <p>
-        I started playing chess when I was five years old, and I still play every day for at least 30 minutes. I enjoy practising, improving my skills and challenging myself to find better moves. I also aim to get at least five checkmates every day when I play.
-      </p>
-
-      <p>
-        I have also made a chess clock for the club, so if you want to play a proper timed game, you can use it. Whether you are here to learn, practise, compete with your friends or simply have fun, there is a place for you at the chess club.
-      </p>
-
-      <p>
-        Use the <strong>Chess Clock</strong> button on the home screen to
-        jump straight into the clock and start a timed game with a friend.
-      </p>
-
-      <button id="info-back-btn" class="btn-secondary">Back</button>
     </div>
-  </div>
 
-  <!-- ============ WELCOME SCREEN ============ -->
-  <div id="welcome-screen" class="screen">
-    <div class="welcome-content">
-      <div class="welcome-icon">♟</div>
-      <h1>Chess Clock</h1>
-      <p>Loading…</p>
-    </div>
-  </div>
+  </section>
 
-  <!-- ============ TIME SELECTION MENU ============ -->
-  <div id="menu-screen" class="screen">
-    <div class="menu-container">
-      <div class="menu-title">Select Game Time</div>
 
-      <div class="section-label">Pick a Time</div>
+  <!-- WELCOME SCREEN -->
+  <section id="welcome-screen" class="screen">
 
-      <div class="time-grid">
-        <button class="time-btn" data-minutes="1">1 min</button>
-        <button class="time-btn" data-minutes="5">5 min</button>
-        <button class="time-btn" data-minutes="10">10 min</button>
-        <button class="time-btn" data-minutes="20">20 min</button>
-        <button class="time-btn" data-minutes="30">30 min</button>
-        <button class="time-btn" data-minutes="50">50 min</button>
-        <button class="time-btn" data-minutes="60">1 hour</button>
-        <button class="time-btn" data-minutes="120">2 hours</button>
-        <button class="time-btn" data-minutes="180">3 hours</button>
-      </div>
+    <div class="welcome-container">
 
-      <div class="divider"></div>
+      <h1>Welcome to Chess Clock</h1>
 
-      <button id="custom-time-btn" class="custom-btn">⚙ Custom Time</button>
+      <p>Choose a time control to begin.</p>
 
-      <button id="menu-home-btn" class="link-btn">
-        ← Back to Home
+      <button id="welcome-continue-btn" class="main-btn">
+        Continue
       </button>
-    </div>
-  </div>
 
-  <!-- ============ CUSTOM TIME SCREEN ============ -->
-  <div id="custom-screen" class="screen">
+    </div>
+
+  </section>
+
+
+  <!-- TIME MENU -->
+  <section id="menu-screen" class="screen">
+
+    <div class="menu-container">
+
+      <h1>Choose Time</h1>
+
+      <div class="time-buttons">
+
+        <button class="time-btn" data-minutes="1">1 Minute</button>
+        <button class="time-btn" data-minutes="5">5 Minutes</button>
+        <button class="time-btn" data-minutes="10">10 Minutes</button>
+        <button class="time-btn" data-minutes="20">20 Minutes</button>
+        <button class="time-btn" data-minutes="30">30 Minutes</button>
+        <button class="time-btn" data-minutes="50">50 Minutes</button>
+        <button class="time-btn" data-minutes="60">1 Hour</button>
+        <button class="time-btn" data-minutes="120">2 Hours</button>
+        <button class="time-btn" data-minutes="180">3 Hours</button>
+
+      </div>
+
+      <button id="custom-time-btn" class="main-btn">
+        Custom Time
+      </button>
+
+      <button id="menu-back-btn" class="back-btn">
+        ← Back
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- CUSTOM TIME SCREEN -->
+  <section id="custom-screen" class="screen">
+
     <div class="custom-container">
-      <h2>Custom Time</h2>
 
-      <div class="field-group">
-        <label>Opponent 1 Starting Time</label>
+      <h1>Custom Time</h1>
 
-        <div class="field-row">
-          <input type="number" id="custom-p1-min" min="0" placeholder="Minutes" value="5">
-          <input type="number" id="custom-p1-sec" min="0" max="59" placeholder="Seconds" value="0">
-        </div>
-      </div>
+      <label for="custom-minutes">Minutes</label>
+      <input id="custom-minutes" type="number" min="1" value="10">
 
-      <div class="field-group">
-        <label>Opponent 2 Starting Time</label>
+      <label for="custom-seconds">Seconds</label>
+      <input id="custom-seconds" type="number" min="0" max="59" value="0">
 
-        <div class="field-row">
-          <input type="number" id="custom-p2-min" min="0" placeholder="Minutes" value="5">
-          <input type="number" id="custom-p2-sec" min="0" max="59" placeholder="Seconds" value="0">
-        </div>
-      </div>
+      <label for="custom-increment">Increment</label>
+      <input id="custom-increment" type="number" min="0" value="0">
 
-      <div class="field-group">
-        <label>Increment per Move (seconds)</label>
+      <button id="custom-start-btn" class="main-btn">
+        Start Game
+      </button>
 
-        <div class="field-row">
-          <input type="number" id="custom-increment" min="0" placeholder="Seconds" value="0">
-        </div>
+      <button id="custom-back-btn" class="back-btn">
+        ← Back
+      </button>
 
-        <span class="field-hint">
-          Time added to a player's clock after they finish their move.
-        </span>
-      </div>
-
-      <div class="custom-actions">
-        <button id="custom-back-btn" class="btn-secondary">
-          Back
-        </button>
-
-        <button id="custom-start-btn" class="btn-primary">
-          Start Game
-        </button>
-      </div>
     </div>
-  </div>
 
-  <!-- ============ CLOCK SCREEN ============ -->
-  <div id="clock-screen" class="screen">
+  </section>
+
+
+  <!-- CHESS CLOCK -->
+  <section id="clock-screen" class="screen">
+
     <div class="clock-container">
 
-      <div id="player-top" class="player inactive" data-player="2">
-        <div class="player-info">
-          <div class="player-name">Opponent 2</div>
-          <div class="player-time" id="time-2">5:00</div>
-          <div class="player-status" id="status-2"></div>
-        </div>
+      <div id="player-1" class="player-clock">
+        <div class="player-name">Player 1</div>
+        <div id="clock-1" class="clock-time">10:00</div>
       </div>
 
-      <div id="player-bottom" class="player inactive" data-player="1">
-        <div class="player-info">
-          <div class="player-name">Opponent 1</div>
-          <div class="player-time" id="time-1">5:00</div>
-          <div class="player-status" id="status-1"></div>
-        </div>
+      <div class="clock-controls">
+
+        <button id="pause-btn" class="control-btn">
+          Pause
+        </button>
+
+        <button id="reset-btn" class="control-btn">
+          Reset
+        </button>
+
       </div>
 
-      <div class="center-controls" id="center-controls">
-        <button id="start-btn" aria-label="Start">▶</button>
-      </div>
-
-      <div class="mini-controls hidden" id="mini-controls">
-        <button id="pause-btn" class="mini-btn">Pause</button>
-        <button id="reset-btn" class="mini-btn">Reset</button>
+      <div id="player-2" class="player-clock">
+        <div class="player-name">Player 2</div>
+        <div id="clock-2" class="clock-time">10:00</div>
       </div>
 
     </div>
-  </div>
 
-  <!-- ============ GAME OVER OVERLAY ============ -->
-  <div id="gameover-overlay">
-    <div class="gameover-box">
-      <h2 id="gameover-title">Game Over</h2>
+  </section>
+
+
+  <!-- GAME OVER -->
+  <section id="gameover-screen" class="screen">
+
+    <div class="gameover-container">
+
+      <h1>Game Over</h1>
+
       <p id="gameover-message"></p>
 
-      <button id="gameover-menu-btn" class="btn-primary">
-        Back to Menu
+      <button id="gameover-reset-btn" class="main-btn">
+        Play Again
       </button>
+
+      <button id="gameover-menu-btn" class="back-btn">
+        Main Menu
+      </button>
+
     </div>
-  </div>
+
+  </section>
+
 
   <script src="script.js"></script>
+
 </body>
 </html>
